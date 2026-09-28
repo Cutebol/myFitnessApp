@@ -224,11 +224,23 @@ export default function FoodScreen() {
     if (result.canceled) return;
 
     try {
-      const pickedUri = result.assets[0].uri;
+      const pickedAsset = result.assets[0];
+      const maxDimension = 1280;
+      const resizeAction =
+        Math.max(pickedAsset.width, pickedAsset.height) > maxDimension
+          ? [
+              {
+                resize:
+                  pickedAsset.width >= pickedAsset.height
+                    ? { width: maxDimension }
+                    : { height: maxDimension },
+              },
+            ]
+          : [];
 
       const manipulated = await ImageManipulator.manipulateAsync(
-        pickedUri,
-        [],
+        pickedAsset.uri,
+        resizeAction,
         {
           compress: 0.8,
           format: ImageManipulator.SaveFormat.JPEG,

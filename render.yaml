@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: myfitnessapp-api
+    runtime: node
+    plan: free
+    rootDir: myFitnessBackend
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: NODE_ENV
+        value: production
+      - key: ALLOWED_ORIGINS
+        value: https://cutebol.github.io
+      - key: OPENAI_API_KEY
+        sync: false

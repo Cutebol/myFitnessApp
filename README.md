@@ -78,3 +78,16 @@ npm run check
 - The current app stores workout and food data locally with AsyncStorage.
 - Pushes to `main` automatically check, export, and deploy the website to GitHub Pages.
 - The production website is configured for the `/myFitnessApp` repository path.
+
+## Render Backend
+
+The root `render.yaml` deploys `myFitnessBackend` as a free Render web service.
+
+1. In Render, create a Blueprint from this GitHub repository.
+2. Enter `OPENAI_API_KEY` when Render requests the secret value.
+3. After deployment, set the GitHub Actions repository variable
+   `EXPO_PUBLIC_API_URL` to the Render service origin, without a trailing slash.
+4. Run the `Deploy website` workflow again so GitHub Pages includes the API URL.
+
+The free Render service sleeps after 15 minutes without traffic. The first meal
+analysis after that can take about a minute longer while the service wakes up.
