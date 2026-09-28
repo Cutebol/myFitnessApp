@@ -26,7 +26,7 @@ export default function ModalScreen() {
           style={{
             width: 52,
             height: 52,
-            borderRadius: 18,
+            borderRadius: 8,
             backgroundColor: colors.surfaceTint,
             alignItems: 'center',
             justifyContent: 'center',

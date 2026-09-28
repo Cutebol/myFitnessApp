@@ -1,8 +1,9 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
+import { PageFrame } from '../../components/page-frame';
 import { radii, useAppTheme } from '../../components/workout/theme';
 import { Day } from '../../components/workout/types';
 
@@ -85,8 +86,9 @@ export default function HistoryScreen() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={{ padding: 18, paddingBottom: 40 }}
+      contentContainerStyle={{ paddingBottom: 0 }}
     >
+      <PageFrame maxWidth={1000}>
       <Text
         style={{
           fontSize: 30,
@@ -252,6 +254,7 @@ export default function HistoryScreen() {
           </View>
         )}
       </View>
+      </PageFrame>
     </ScrollView>
   );
 }

@@ -23,3 +23,9 @@ npm run lint
 npx tsc --noEmit
 npx expo export --platform web
 ```
+
+## Website deployment
+
+The app exports static routes with a `/myFitnessApp` base path. The repository's
+GitHub Pages workflow builds and publishes `dist` whenever frontend changes are
+pushed to `main`.

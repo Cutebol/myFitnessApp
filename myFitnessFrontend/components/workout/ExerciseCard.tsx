@@ -41,7 +41,7 @@ export default function ExerciseCard({
     <View
       style={{
         backgroundColor: colors.surfaceMuted,
-        borderRadius: 16,
+        borderRadius: 8,
         padding: 12,
         marginBottom: 12,
         borderWidth: 1,
@@ -113,7 +113,7 @@ export default function ExerciseCard({
             style={{
               backgroundColor: colors.primary,
               paddingVertical: 12,
-              borderRadius: 12,
+              borderRadius: 6,
               alignItems: 'center',
               marginBottom: 12,
             }}

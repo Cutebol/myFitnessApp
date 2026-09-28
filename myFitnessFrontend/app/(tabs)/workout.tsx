@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useMemo, useState } from 'react';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { PageFrame } from '../../components/page-frame';
 import DayCard from '../../components/workout/DayCard';
 import { radii, useAppTheme } from '../../components/workout/theme';
 import { Day, Exercise, SetEntry } from '../../components/workout/types';
@@ -21,7 +22,19 @@ export default function WorkoutScreen() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    loadDays();
+    void (async () => {
+      try {
+        const storedValue = await AsyncStorage.getItem(STORAGE_KEY);
+        if (storedValue) {
+          const parsedDays: Day[] = JSON.parse(storedValue);
+          setDays(parsedDays);
+        }
+      } catch (error) {
+        console.log('Failed to load workout data:', error);
+      } finally {
+        setLoaded(true);
+      }
+    })();
   }, []);
 
   useEffect(() => {
@@ -36,20 +49,6 @@ export default function WorkoutScreen() {
 
     persistDays();
   }, [days, loaded]);
-
-  const loadDays = async () => {
-    try {
-      const storedValue = await AsyncStorage.getItem(STORAGE_KEY);
-      if (storedValue) {
-        const parsedDays: Day[] = JSON.parse(storedValue);
-        setDays(parsedDays);
-      }
-    } catch (error) {
-      console.log('Failed to load workout data:', error);
-    } finally {
-      setLoaded(true);
-    }
-  };
 
   const addDay = () => {
     const trimmed = dayName.trim();
@@ -338,7 +337,7 @@ export default function WorkoutScreen() {
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="interactive"
     >
-      <View style={{ padding: 18 }}>
+      <PageFrame maxWidth={1000}>
         <Text
           style={{
             fontSize: 30,
@@ -444,7 +443,7 @@ export default function WorkoutScreen() {
             style={{
               borderWidth: 1,
               borderColor: colors.inputBorder,
-              borderRadius: 12,
+              borderRadius: 6,
               padding: 12,
               backgroundColor: colors.inputBg,
               color: colors.text,
@@ -541,7 +540,7 @@ export default function WorkoutScreen() {
             />
           ))
         )}
-      </View>
+      </PageFrame>
     </KeyboardAwareScrollView>
   );
 }

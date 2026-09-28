@@ -12,6 +12,7 @@ import {
   View,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { PageFrame } from '../../components/page-frame';
 import { radii, useAppTheme } from '../../components/workout/theme';
 
 type MealItem = {
@@ -50,8 +51,12 @@ type Meal = {
   expanded?: boolean;
 };
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3001';
-const ANALYZE_MEAL_URL = `${API_BASE_URL.replace(/\/$/, '')}/analyze-meal`;
+const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL?.trim() ||
+  (__DEV__ ? 'http://localhost:3001' : undefined);
+const ANALYZE_MEAL_URL = API_BASE_URL
+  ? `${API_BASE_URL.replace(/\/$/, '')}/analyze-meal`
+  : null;
 const MEALS_STORAGE_KEY = 'food_meals_v1';
 const GOALS_STORAGE_KEY = 'food_goals_v1';
 
@@ -136,7 +141,34 @@ export default function FoodScreen() {
   const [proteinGoal, setProteinGoal] = useState('150');
 
   useEffect(() => {
-    loadData();
+    void (async () => {
+      try {
+        const [storedMeals, storedGoals] = await Promise.all([
+          AsyncStorage.getItem(MEALS_STORAGE_KEY),
+          AsyncStorage.getItem(GOALS_STORAGE_KEY),
+        ]);
+
+        if (storedMeals) {
+          const parsedMeals: Meal[] = JSON.parse(storedMeals);
+          setMeals(
+            parsedMeals.map((meal) => ({
+              ...meal,
+              expanded: false,
+            }))
+          );
+        }
+
+        if (storedGoals) {
+          const parsedGoals = JSON.parse(storedGoals);
+          setCalorieGoal(String(parsedGoals.calorieGoal ?? '2000'));
+          setProteinGoal(String(parsedGoals.proteinGoal ?? '150'));
+        }
+      } catch (error) {
+        console.log('Failed to load food data:', error);
+      } finally {
+        setLoaded(true);
+      }
+    })();
   }, []);
 
   useEffect(() => {
@@ -170,35 +202,6 @@ export default function FoodScreen() {
 
     persistGoals();
   }, [calorieGoal, proteinGoal, loaded]);
-
-  const loadData = async () => {
-    try {
-      const [storedMeals, storedGoals] = await Promise.all([
-        AsyncStorage.getItem(MEALS_STORAGE_KEY),
-        AsyncStorage.getItem(GOALS_STORAGE_KEY),
-      ]);
-
-      if (storedMeals) {
-        const parsedMeals: Meal[] = JSON.parse(storedMeals);
-        setMeals(
-          parsedMeals.map((meal) => ({
-            ...meal,
-            expanded: false,
-          }))
-        );
-      }
-
-      if (storedGoals) {
-        const parsedGoals = JSON.parse(storedGoals);
-        setCalorieGoal(String(parsedGoals.calorieGoal ?? '2000'));
-        setProteinGoal(String(parsedGoals.proteinGoal ?? '150'));
-      }
-    } catch (error) {
-      console.log('Failed to load food data:', error);
-    } finally {
-      setLoaded(true);
-    }
-  };
 
   const pickImage = async () => {
     const permissionResult =
@@ -243,6 +246,12 @@ export default function FoodScreen() {
       let analysis: MealAnalysis | undefined;
 
       if (image) {
+        if (!ANALYZE_MEAL_URL) {
+          throw new Error(
+            'Photo analysis is not connected on this deployment. Add the meal as text or configure EXPO_PUBLIC_API_URL.'
+          );
+        }
+
         const formData = new FormData();
         formData.append('description', description);
 
@@ -392,7 +401,7 @@ export default function FoodScreen() {
     minWidth: 0,
     borderWidth: 1,
     borderColor: colors.inputBorder,
-    borderRadius: 10,
+    borderRadius: 6,
     paddingVertical: 10,
     paddingHorizontal: 12,
     backgroundColor: colors.inputBg,
@@ -413,7 +422,7 @@ export default function FoodScreen() {
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="interactive"
     >
-      <View style={{ padding: 18 }}>
+      <PageFrame>
         <Text
           style={{
             fontSize: 30,
@@ -738,7 +747,7 @@ export default function FoodScreen() {
                 <View
                   style={{
                     backgroundColor: colors.surfaceMuted,
-                    borderRadius: 12,
+                    borderRadius: 6,
                     padding: 10,
                   }}
                 >
@@ -922,7 +931,7 @@ export default function FoodScreen() {
                           key={index}
                           style={{
                             backgroundColor: colors.surface,
-                            borderRadius: 10,
+                            borderRadius: 6,
                             padding: 10,
                             marginBottom: 8,
                             borderWidth: 1,
@@ -1017,7 +1026,7 @@ export default function FoodScreen() {
             </View>
           ))
         )}
-      </View>
+      </PageFrame>
     </KeyboardAwareScrollView>
   );
 }

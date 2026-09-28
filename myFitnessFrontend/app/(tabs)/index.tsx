@@ -1,8 +1,9 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from 'expo-router';
 import { ComponentProps, useCallback, useMemo, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { PageFrame } from '../../components/page-frame';
 import { ThemeModeControl } from '../../components/theme-mode-control';
 import { radii, useAppTheme } from '../../components/workout/theme';
 import { Day } from '../../components/workout/types';
@@ -160,6 +161,8 @@ function ProgressBar({
 
 export default function HomeScreen() {
   const { cardShadow, colors } = useAppTheme();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 900;
   const [meals, setMeals] = useState<Meal[]>([]);
   const [days, setDays] = useState<Day[]>([]);
   const [calorieGoal, setCalorieGoal] = useState(2000);
@@ -248,36 +251,48 @@ export default function HomeScreen() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={{ padding: 18, paddingBottom: 40 }}
+      contentContainerStyle={{ paddingBottom: 0 }}
     >
-      <Text
+      <PageFrame>
+      <View
         style={{
-          color: colors.textSecondary,
-          fontSize: 14,
-          fontWeight: '700',
-          marginBottom: 4,
+          flexDirection: isDesktop ? 'row' : 'column',
+          alignItems: isDesktop ? 'flex-end' : 'stretch',
+          justifyContent: 'space-between',
+          gap: 18,
+          marginBottom: 20,
         }}
       >
-        {new Date().toLocaleDateString(undefined, {
-          weekday: 'long',
-          month: 'long',
-          day: 'numeric',
-        })}
-      </Text>
+        <View>
+          <Text
+            style={{
+              color: colors.textSecondary,
+              fontSize: 14,
+              fontWeight: '700',
+              marginBottom: 4,
+            }}
+          >
+            {new Date().toLocaleDateString(undefined, {
+              weekday: 'long',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </Text>
 
-      <Text
-        style={{
-          fontSize: 32,
-          fontWeight: '800',
-          color: colors.text,
-          marginBottom: 16,
-        }}
-      >
-        Today
-      </Text>
+          <Text
+            style={{
+              fontSize: 32,
+              fontWeight: '800',
+              color: colors.text,
+            }}
+          >
+            Today
+          </Text>
+        </View>
 
-      <View style={{ marginBottom: 16 }}>
-        <ThemeModeControl />
+        <View style={{ width: isDesktop ? 360 : '100%' }}>
+          <ThemeModeControl />
+        </View>
       </View>
 
       <View style={{ flexDirection: 'row', gap: 10, marginBottom: 16 }}>
@@ -301,8 +316,10 @@ export default function HomeScreen() {
         />
       </View>
 
+      <View style={{ flexDirection: isDesktop ? 'row' : 'column', gap: 16 }}>
       <View
         style={{
+          flex: 1,
           backgroundColor: colors.surface,
           borderRadius: radii.card,
           padding: 16,
@@ -347,6 +364,7 @@ export default function HomeScreen() {
 
       <View
         style={{
+          flex: 1,
           backgroundColor: colors.surface,
           borderRadius: radii.card,
           padding: 16,
@@ -390,6 +408,7 @@ export default function HomeScreen() {
           </Text>
         )}
       </View>
+      </View>
 
       {latestMeal && (
         <View
@@ -418,6 +437,7 @@ export default function HomeScreen() {
           </Text>
         </View>
       )}
+      </PageFrame>
     </ScrollView>
   );
 }

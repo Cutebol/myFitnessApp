@@ -76,4 +76,5 @@ npm run check
 - The backend must be deployed somewhere reachable by the app, then set `EXPO_PUBLIC_API_URL` to that deployed origin.
 - The backend needs `OPENAI_API_KEY` in its runtime environment.
 - The current app stores workout and food data locally with AsyncStorage.
-- Expo still recommends aligning a few SDK package patch versions. The attempted network install was interrupted, so this repo is left on the currently installed, verified dependency set.
+- Pushes to `main` automatically check, export, and deploy the website to GitHub Pages.
+- The production website is configured for the `/myFitnessApp` repository path.

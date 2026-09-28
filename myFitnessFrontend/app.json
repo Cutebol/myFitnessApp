@@ -38,9 +38,14 @@
             "backgroundColor": "#0F172A"
           }
         }
-      ]
+      ],
+      "expo-font",
+      "expo-image",
+      "expo-status-bar",
+      "expo-web-browser"
     ],
     "experiments": {
+      "baseUrl": "/myFitnessApp",
       "typedRoutes": true,
       "reactCompiler": true
     }

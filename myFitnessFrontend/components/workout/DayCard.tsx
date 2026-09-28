@@ -53,7 +53,7 @@ export default function DayCard({
     <View
       style={{
         backgroundColor: colors.surface,
-        borderRadius: 18,
+        borderRadius: 8,
         borderWidth: 1,
         borderColor: colors.border,
         marginBottom: 16,
@@ -147,7 +147,7 @@ export default function DayCard({
             style={{
               borderWidth: 1,
               borderColor: colors.inputBorder,
-              borderRadius: 12,
+              borderRadius: 6,
               padding: 12,
               backgroundColor: colors.inputBg,
               color: colors.text,
@@ -160,7 +160,7 @@ export default function DayCard({
             style={{
               backgroundColor: colors.primary,
               paddingVertical: 14,
-              borderRadius: 12,
+              borderRadius: 6,
               alignItems: 'center',
               marginBottom: 16,
             }}

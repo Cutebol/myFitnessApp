@@ -17,26 +17,26 @@ export type ThemePreference = 'system' | 'light' | 'dark';
 export type ActiveColorScheme = 'light' | 'dark';
 
 const lightColors = {
-  background: '#F7F8FA',
+  background: '#F5F7F8',
   surface: '#FFFFFF',
-  surfaceMuted: '#F1F5F9',
-  surfaceTint: '#ECFDF5',
+  surfaceMuted: '#F0F3F4',
+  surfaceTint: '#E7F5F1',
 
   text: '#111827',
   textSecondary: '#5B6472',
   textMuted: '#94A3B8',
 
-  border: '#E2E8F0',
-  borderSoft: '#EEF2F7',
+  border: '#DDE3E5',
+  borderSoft: '#E9EDEF',
 
   primary: '#0F766E',
   primaryPressed: '#115E59',
   primaryText: '#FFFFFF',
 
-  accent: '#2563EB',
-  accentSoft: '#DBEAFE',
-  amber: '#F59E0B',
-  amberSoft: '#FEF3C7',
+  accent: '#315A8A',
+  accentSoft: '#E5EEF7',
+  amber: '#B7791F',
+  amberSoft: '#FAF0D8',
 
   control: '#EEF6F3',
   controlText: '#0F5E56',
@@ -48,30 +48,30 @@ const lightColors = {
   inputBorder: '#D7DCE5',
 
   progressTrack: '#EEF2F7',
-  shadow: 'rgba(15, 23, 42, 0.06)',
+  shadow: 'rgba(20, 38, 46, 0.05)',
 };
 
 const darkColors: typeof lightColors = {
-  background: '#0B1120',
-  surface: '#121A2B',
-  surfaceMuted: '#172033',
-  surfaceTint: '#0F2E2A',
+  background: '#101617',
+  surface: '#172022',
+  surfaceMuted: '#1E292B',
+  surfaceTint: '#12332E',
 
   text: '#F8FAFC',
   textSecondary: '#CBD5E1',
   textMuted: '#64748B',
 
-  border: '#243044',
-  borderSoft: '#1E293B',
+  border: '#2D3A3D',
+  borderSoft: '#253235',
 
   primary: '#2DD4BF',
   primaryPressed: '#5EEAD4',
   primaryText: '#042F2E',
 
-  accent: '#93C5FD',
-  accentSoft: '#172554',
-  amber: '#FBBF24',
-  amberSoft: '#3B2F12',
+  accent: '#9ABCE0',
+  accentSoft: '#203248',
+  amber: '#E6B85C',
+  amberSoft: '#3A301D',
 
   control: '#153633',
   controlText: '#99F6E4',
@@ -91,8 +91,8 @@ export type AppColors = typeof lightColors;
 export const colors = lightColors;
 
 export const radii = {
-  card: 16,
-  control: 12,
+  card: 8,
+  control: 6,
   pill: 999,
 };
 
@@ -102,7 +102,7 @@ function getCardShadow(colorScheme: ActiveColorScheme) {
 
   return Platform.select({
     web: {
-      boxShadow: `0 8px 18px ${shadowColor}`,
+      boxShadow: `0 5px 14px ${shadowColor}`,
     },
     default: {
       shadowColor: colorScheme === 'dark' ? '#000000' : '#0F172A',

@@ -53,7 +53,7 @@ export default function IconButton({
         {
           width: 36,
           height: 36,
-          borderRadius: 12,
+          borderRadius: 6,
           alignItems: 'center',
           justifyContent: 'center',
           backgroundColor,
