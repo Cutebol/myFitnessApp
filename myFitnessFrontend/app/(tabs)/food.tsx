@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   Image,
+  Platform,
   Text,
   TextInput,
   TouchableOpacity,
@@ -62,6 +63,42 @@ const GOALS_STORAGE_KEY = 'food_goals_v1';
 
 function clampProgress(value: number) {
   return Math.max(0, Math.min(value, 1));
+}
+
+async function appendMealImage(formData: FormData, imageUri: string) {
+  if (Platform.OS === 'web') {
+    const imageResponse = await fetch(imageUri);
+
+    if (!imageResponse.ok) {
+      throw new Error('The selected photo could not be prepared for upload.');
+    }
+
+    const imageBlob = await imageResponse.blob();
+    const jpegBlob =
+      imageBlob.type === 'image/jpeg'
+        ? imageBlob
+        : imageBlob.slice(0, imageBlob.size, 'image/jpeg');
+
+    formData.append('image', jpegBlob, 'meal.jpg');
+    return;
+  }
+
+  formData.append('image', {
+    uri: imageUri,
+    name: 'meal.jpg',
+    type: 'image/jpeg',
+  } as any);
+}
+
+async function getApiError(response: Response) {
+  try {
+    const result = await response.json();
+    return typeof result.error === 'string'
+      ? result.error
+      : 'Failed to analyze meal';
+  } catch {
+    return 'Failed to analyze meal';
+  }
 }
 
 type ProgressBarProps = {
@@ -274,12 +311,7 @@ export default function FoodScreen() {
       if (image && ANALYZE_MEAL_URL) {
         const formData = new FormData();
         formData.append('description', trimmedDescription);
-
-        formData.append('image', {
-          uri: image,
-          name: 'meal.jpg',
-          type: 'image/jpeg',
-        } as any);
+        await appendMealImage(formData, image);
 
         const response = await fetch(ANALYZE_MEAL_URL, {
           method: 'POST',
@@ -287,8 +319,7 @@ export default function FoodScreen() {
         });
 
         if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(errorText || 'Failed to analyze meal');
+          throw new Error(await getApiError(response));
         }
 
         const result = await response.json();
