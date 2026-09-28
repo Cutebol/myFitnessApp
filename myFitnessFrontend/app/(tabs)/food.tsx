@@ -136,6 +136,10 @@ export default function FoodScreen() {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [mealMessage, setMealMessage] = useState<{
+    message: string;
+    tone: 'error' | 'success';
+  } | null>(null);
 
   const [calorieGoal, setCalorieGoal] = useState('2000');
   const [proteinGoal, setProteinGoal] = useState('150');
@@ -238,22 +242,26 @@ export default function FoodScreen() {
   };
 
   const addMeal = async () => {
-    if (!image && description.trim() === '') return;
+    const trimmedDescription = description.trim();
+
+    if (!image && trimmedDescription === '') {
+      setMealMessage({
+        message: 'Add a description or choose a photo first.',
+        tone: 'error',
+      });
+      return;
+    }
 
     try {
       setIsLoading(true);
+      setMealMessage(null);
 
       let analysis: MealAnalysis | undefined;
+      let savedWithoutAnalysis = false;
 
-      if (image) {
-        if (!ANALYZE_MEAL_URL) {
-          throw new Error(
-            'Photo analysis is not connected on this deployment. Add the meal as text or configure EXPO_PUBLIC_API_URL.'
-          );
-        }
-
+      if (image && ANALYZE_MEAL_URL) {
         const formData = new FormData();
-        formData.append('description', description);
+        formData.append('description', trimmedDescription);
 
         formData.append('image', {
           uri: image,
@@ -303,12 +311,14 @@ export default function FoodScreen() {
               }))
             : [],
         };
+      } else if (image) {
+        savedWithoutAnalysis = true;
       }
 
       const newMeal: Meal = {
         id: String(Date.now() + Math.random()),
         image,
-        description: description.trim(),
+        description: trimmedDescription,
         createdAt: new Date().toISOString(),
         analysis,
         expanded: false,
@@ -317,11 +327,19 @@ export default function FoodScreen() {
       setMeals((prev) => [newMeal, ...prev]);
       setImage(null);
       setDescription('');
+      setMealMessage({
+        message: savedWithoutAnalysis
+          ? 'Meal saved. Photo analysis will be added when the analysis service is connected.'
+          : analysis
+            ? 'Meal analyzed and saved.'
+            : 'Meal saved.',
+        tone: 'success',
+      });
     } catch (error: any) {
-      Alert.alert(
-        'Meal analysis failed',
-        error?.message || 'Something went wrong.'
-      );
+      setMealMessage({
+        message: error?.message || 'Meal analysis failed. Please try again.',
+        tone: 'error',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -411,8 +429,6 @@ export default function FoodScreen() {
 
   const calorieGoalNumber = Number(calorieGoal) || 0;
   const proteinGoalNumber = Number(proteinGoal) || 0;
-  const canAddMeal = image !== null || description.trim() !== '';
-
   return (
     <KeyboardAwareScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
@@ -593,10 +609,13 @@ export default function FoodScreen() {
           )}
 
           <TextInput
-            placeholder="Describe your meal..."
+            placeholder="Describe your meal in any language..."
             placeholderTextColor={colors.textMuted}
             value={description}
-            onChangeText={setDescription}
+            onChangeText={(value) => {
+              setDescription(value);
+              if (mealMessage?.tone === 'error') setMealMessage(null);
+            }}
             multiline
             style={{
               borderWidth: 1,
@@ -613,10 +632,11 @@ export default function FoodScreen() {
 
           <TouchableOpacity
             onPress={addMeal}
-            disabled={isLoading || !canAddMeal}
+            disabled={isLoading}
+            accessibilityRole="button"
+            accessibilityLabel="Add meal"
             style={{
-              backgroundColor:
-                isLoading || !canAddMeal ? colors.border : colors.primary,
+              backgroundColor: isLoading ? colors.border : colors.primary,
               paddingVertical: 14,
               borderRadius: radii.control,
               alignItems: 'center',
@@ -632,6 +652,24 @@ export default function FoodScreen() {
               {isLoading ? 'Analyzing...' : 'Add Meal'}
             </Text>
           </TouchableOpacity>
+
+          {mealMessage && (
+            <Text
+              accessibilityRole={mealMessage.tone === 'error' ? 'alert' : 'text'}
+              style={{
+                color:
+                  mealMessage.tone === 'error'
+                    ? colors.dangerText
+                    : colors.primary,
+                fontSize: 14,
+                fontWeight: '700',
+                lineHeight: 20,
+                marginTop: 10,
+              }}
+            >
+              {mealMessage.message}
+            </Text>
+          )}
         </View>
 
         {meals.length === 0 ? (
